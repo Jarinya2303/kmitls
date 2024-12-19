@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route from Excel</title>
+    <!-- นำเข้า CSS ของ Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- นำเข้า Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+
+        .navbar-custom {
+            background-color: #ee9626;
+            height: 70px;
+            border-radius: 15px;
+        }
+
+        .container {
+            margin-top: 80px;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: .5rem;
+            font-weight: 600;
+        }
+
+        .btn-custom {
+            margin-top: 20px;
+            background-color: #0588c8;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+
+        .flash-message {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: .25rem;
+            color: #ffffff;
+            display: none;
+        }
+
+        .flash-message.success {
+            background-color: #28a745;
+        }
+
+        .flash-message.danger {
+            background-color: #dc3545;
+        }
+
+        #loading {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+        }
+
+        .spinner {
+            border: 8px solid rgba(0, 0, 0, 0.1);
+            border-top: 8px solid #000;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .navbar-custom {
+            background-color: #ee9626;
+        }
+
+        .navbar-brand {
+            font-size: 2rem;
+            color: #ffffff;
+        }
+
+        .navbar-nav .nav-link {
+            color: #000 !important;
+            background-color: #ee9626;
+            border-radius: 12px;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: #d77a22;
+            color: #ffffff !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            background-color: #d77a22;
+            color: #ffffff !important;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar with Menu -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">J.Charoen Shrimp Feed</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'home' else '' }}" href="{{ url_for('home') }}">
+                            <i class="bi bi-house"></i> หน้าแรก
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'upload' else '' }}" href="{{ url_for('upload') }}">
+                            <i class="bi bi-graph-up"></i> อัปโหลดข้อมูลให้คำนวณเส้นทาง
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'map_driver' else '' }}" href="{{ url_for('map_driver') }}">
+                            <i class="bi bi-map"></i> แผนที่การจัดส่ง
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'customer_list' else '' }}" href="{{ url_for('customer_list') }}">
+                            <i class="bi bi-person"></i> ข้อมูลลูกค้า
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'product_list' else '' }}" href="{{ url_for('product_list') }}">
+                            <i class="bi bi-box"></i> รายการสินค้า
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'logout' else '' }}" href="{{ url_for('logout') }}">
+                            <i class="bi bi-box-arrow-right"></i> ออกจากระบบ
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="form-container">
+            <div id="loading">
+                <div class="spinner"></div>
+                กำลังคำนวณเส้นทาง โปรดรอสักครู่
+            </div>
+
+            <!-- Flash message -->
+            <div id="flashMessage" class="flash-message" style="display: none;">
+                <!-- ข้อความจะถูกแสดงจาก JavaScript -->
+            </div>
+
+            <h1 class="mb-4 form-group label">อัพโหลดไฟล์ excel</h1>
+
+            <form id="uploadForm" class="form-container" action="#" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="fileInput">เลือกไฟล์ Excel:</label>
+                    <input id="fileInput" type="file" name="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="form-control">
+                </div>
+                <input id="submitButton" type="submit" value="อัปโหลด" class="btn-custom">
+            </form>
+
+        </div>
+    </div>
+
+    <!-- นำเข้า JavaScript ของ Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        // JavaScript สำหรับการแสดง flash message หลังจากการอัปโหลด
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // ป้องกันการส่งฟอร์มโดยอัตโนมัติ
+
+            var fileInput = document.getElementById('fileInput');
+            var flashMessage = document.getElementById('flashMessage');
+            var formData = new FormData();  // สร้าง FormData object
+            formData.append('file', fileInput.files[0]);  // เพิ่มไฟล์ที่เลือกเข้าไป
+
+            // แสดง loading message
+            document.getElementById('loading').style.visibility = 'visible';
+
+            // ส่งไฟล์ไปยังเซิร์ฟเวอร์โดยใช้ Fetch API
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())  // รับข้อมูลจากเซิร์ฟเวอร์เป็น JSON
+            .then(data => {
+                document.getElementById('loading').style.visibility = 'hidden';  // ซ่อน loading
+                if (data.success) {
+                    flashMessage.className = 'flash-message success'; // ตั้งคลาสให้เป็นสีเขียว
+                    flashMessage.innerHTML = 'อัปโหลดไฟล์สำเร็จ!';
+                } else {
+                    flashMessage.className = 'flash-message danger'; // ตั้งคลาสให้เป็นสีแดง
+                    flashMessage.innerHTML = 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์';
+                }
+                flashMessage.style.display = 'block';  // แสดงข้อความ
+                setTimeout(function() {
+                    flashMessage.style.display = 'none'; // ซ่อนข้อความหลังจาก 3 วินาที
+                }, 3000);
+            })
+            .catch(error => {
+                document.getElementById('loading').style.visibility = 'hidden';
+                flashMessage.className = 'flash-message danger';
+                flashMessage.innerHTML = 'ไม่สามารถอัปโหลดไฟล์ได้';
+                flashMessage.style.display = 'block';
+                setTimeout(function() {
+                    flashMessage.style.display = 'none';
+                }, 3000);
+            });
+        });
+    </script>
+
+</body>
+
+</html>

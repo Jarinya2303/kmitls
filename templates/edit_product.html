@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แก้ไขรายการสินค้า</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .form-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-custom {
+            margin-top: 20px;
+            background-color: #ffd966;
+            color: #000;
+            border: none;
+        }
+        .btn-custom:hover {
+            background-color: #ff8257;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #b02a29;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1 class="mb-4">แก้ไขรายการสินค้า</h1>
+            <form action="{{ url_for('edit_product', product_id=product_id) }}" method="POST">
+                {{ form.hidden_tag() }}
+
+                <div class="form-group">
+                    <label for="brand">ยี่ห้อ:</label>
+                    {{ form.brand(class="form-control") }}
+                </div>
+
+            
+
+                <div class="form-group">
+                    <label for="weight_per_bag">น้ำหนักต่อกระสอบ:</label>
+                    {{ form.weight_per_bag(class="form-control") }}
+                </div>
+
+                <div class="form-group">
+                    <label for="price">ราคา:</label>
+                    {{ form.price(class="form-control") }}
+                </div>
+
+            
+
+                <button type="submit" class="btn btn-custom">บันทึกการเปลี่ยนแปลง</button>
+            </form>
+
+            <a href="{{ url_for('product_list') }}" class="back-link">กลับสู่หน้าแรก</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>

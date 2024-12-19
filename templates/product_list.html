@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายการสินค้า</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet"> <!-- เพิ่มไอคอนจาก Bootstrap Icons -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+
+        /* ปรับแต่ง navbar ให้เหมือนกันในทุกหน้า */
+        .navbar-custom {
+            background-color: #ee9626; /* สีพื้นหลังแถบเมนู */
+            height: 70px; /* ความสูงของ navbar */
+            border-radius: 15px; /* โค้งมนที่ขอบของ navbar */
+        }
+
+        .navbar-brand {
+            font-size: 2rem;
+            color: #ffffff;
+        }
+
+        /* เพิ่มการปรับปรุงเพื่อให้เมนูที่เลือกอยู่มีพื้นหลังสีที่ชัดเจน */
+        .navbar-nav .nav-link.active {
+            background-color: #d77a22; /* สีพื้นหลังของเมนูที่เลือก */
+            color: #ffffff !important; /* ให้ตัวอักษรสีขาว */
+            border-radius: 18px; /* ความโค้งมนที่ขอบ */
+        }
+
+        .navbar-nav .nav-link {
+            color: #000 !important;
+            background-color: #ee9626;
+            border-radius: 12px;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: #d77a22;
+            color: #ffffff !important;
+            border-radius: 18px;
+        }
+
+        .container {
+            margin-top: 80px; /* ให้เนื้อหาหลักอยู่ต่ำลงจาก Navbar */
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px; /* เพิ่มความโค้งมนที่มุมของกล่อง */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-custom {
+            margin-top: 20px;
+            background-color: #0588c8;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 12px; /* เพิ่มความโค้งมนให้มากขึ้น */
+            cursor: pointer;
+        }
+
+        .btn-custom:hover {
+            background-color: #0588c8;
+
+        }
+
+        /* เพิ่มการกำหนดสไตล์สำหรับการแสดงข้อความแฟลช */
+        .flash-message {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: .25rem;
+            color: #ffffff;
+        }
+
+        .flash-message.success {
+            background-color: #28a745;
+        }
+
+        .flash-message.danger {
+            background-color: #dc3545;
+        }
+        table {
+            border-radius: 5px; /* เพิ่มความโค้งมนที่กรอบตาราง */
+            overflow: hidden; /* ป้องกันไม่ให้มุมตารางไม่เป็นสี่เหลี่ยม */
+        }
+        th {
+            text-align: center;
+        }
+        td {
+            text-align: center;
+        }
+
+    </style>
+</head>
+
+<body>
+    <!-- Navbar with Menu -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">J.Charoen Shrimp Feed</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'upload' else '' }}" href="{{ url_for('upload') }}">
+                            <i class="bi bi-graph-up"></i> คำนวนเส้นทางการจัดส่ง
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'map_excel' else '' }}" href="{{ url_for('map_excel') }}">
+                            <i class="bi bi-map"></i> แผนที่การจัดส่ง
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'customer_list' else '' }}" href="{{ url_for('customer_list') }}">
+                            <i class="bi bi-person"></i> ข้อมูลลูกค้า
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'product_list' else '' }}" href="{{ url_for('product_list') }}">
+                            <i class="bi bi-box"></i> รายการสินค้า
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'logout' else '' }}" href="{{ url_for('logout') }}">
+                            <i class="bi bi-box-arrow-right"></i> ออกจากระบบ
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-5 pt-5 main-content">
+        <h1 class="mb-4 text-center">รายการสินค้า</h1>
+
+        <!-- แสดงข้อความ flash -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+        <div id="flash-messages">
+            {% for category, message in messages %}
+            <div class="flash-message {{ category }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        <script>
+            setTimeout(function () {
+                var flashMessages = document.getElementById('flash-messages');
+                if (flashMessages) {
+                    flashMessages.style.display = 'none';
+                }
+            }, 5000);
+        </script>
+        {% endif %}
+        {% endwith %}
+
+        <!-- ตารางแสดงข้อมูลผลิตภัณฑ์ -->
+        <table class="table table-striped table-bordered mt-4">
+            <thead class="table-dark">
+                <tr>
+                    <th>ยี่ห้อ</th>
+                    <th>น้ำหนักต่อกระสอบ</th>
+                    <th>ราคา</th>
+                    <th>แก้ไข</th>
+                    {% if current_user.user_type == 'admin' and current_user.email == 'charoen@charoen.com' %}
+                    <th>ลบ</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.brand }}</td>
+                    <td>{{ product.weight_per_bag }}</td>
+                    <td>{{ product.price }}</td>
+                    
+                    <td>
+                        <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-warning btn-sm">แก้ไข</a>
+                    </td>
+                    {% if current_user.user_type == 'admin' and current_user.email == 'charoen@charoen.com' %}
+                    <td>
+                        <form action="{{ url_for('delete_product', product_id=product.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('คุณแน่ใจว่าต้องการลบผลิตภัณฑ์นี้?')">ลบ</button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- ลิงก์กลับสู่หน้าเพิ่มผลิตภัณฑ์ และหน้าแรก -->
+        <a href="{{ url_for('add_product') }}" class="btn btn-secondary btn-custom">เพิ่มสินค้าใหม่</a>
+
+    </main>
+
+    <!-- นำเข้า JavaScript ของ Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

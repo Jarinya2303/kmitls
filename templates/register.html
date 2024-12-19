@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สมัครสมาชิก</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <style>
+        /* 1. การเปลี่ยนพื้นหลังของทั้งหน้า */
+        body {
+            display: flex; /* ใช้ Flexbox เพื่อจัดการจัดตำแหน่งเนื้อหาภายใน body */
+            justify-content: center; /* จัดเนื้อหาให้อยู่กลางในแนวนอน */
+            align-items: center; /* จัดเนื้อหาให้อยู่กลางในแนวตั้ง */
+            min-height: 100vh; /* ทำให้หน้าเว็บมีความสูงอย่างน้อยเต็มหน้าจอ */
+            background: url('{{ url_for('static', filename='กุ้งงง.jpg') }}') no-repeat center center fixed; /* ตั้งค่าภาพพื้นหลัง */
+            background-size: cover; /* ให้ภาพพื้นหลังขยายครอบคลุมพื้นที่ทั้งหน้า */
+            margin: 0; /* ลบช่องว่างภายใน body */
+            font-family: 'Arial', sans-serif; /* กำหนดฟอนต์ให้เป็น Arial */
+        }
+
+        /* 2. การตกแต่งสำหรับ container ของฟอร์ม */
+        .login-container {
+            display: flex; /* ใช้ Flexbox เพื่อจัดการการจัดตำแหน่งของ .login-box */
+            justify-content: center; /* จัดเนื้อหาให้อยู่กลางในแนวนอน */
+            align-items: center; /* จัดเนื้อหาให้อยู่กลางในแนวตั้ง */
+            width: 100%; /* ทำให้ความกว้างเต็มหน้าจอ */
+            height: 100%; /* ทำให้ความสูงเต็มหน้าจอ */
+        }
+
+        /* 3. การตกแต่งสำหรับกล่องฟอร์ม */
+        .login-box {
+            background: #fff; /* พื้นหลังของกล่องเป็นสีขาว */
+            padding: 40px; /* เพิ่มระยะห่างภายในกล่อง */
+            border-radius: 12px; /* มุมของกล่องให้มน */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* เพิ่มเงาที่กล่อง */
+            text-align: center; /* จัดข้อความให้ตรงกลาง */
+            width: 500px; /* กำหนดความกว้างของกล่อง */
+        }
+
+        /* 4. การตกแต่งหัวข้อของฟอร์ม */
+        .login-box h1 {
+            margin-bottom: 50px; /* ระยะห่างด้านล่าง */
+            font-size: 36px; /* ขนาดฟอนต์ของหัวข้อ */
+            color: #333; /* สีของฟอนต์ */
+        }
+
+        /* 5. การตกแต่งกล่องอินพุต */
+        .input-box {
+            position: relative; /* ตั้งตำแหน่งของอินพุต */
+            margin-bottom: 25px; /* ระยะห่างระหว่างกล่องอินพุต */
+            width: 90%; /* กำหนดความกว้างให้เต็ม */
+        }
+
+        /* 6. การตกแต่งอินพุตและเลือก */
+        .form-input, .form-select {
+            width: 100%; /* ทำให้ความกว้างเต็ม */
+            padding: 12px; /* เพิ่มระยะห่างภายใน */
+            padding-left: 45px; /* เพิ่มระยะห่างทางซ้าย */
+            background: #f7f9fc; /* พื้นหลังของอินพุต */
+            border: 1px solid #ddd; /* กรอบของอินพุต */
+            border-radius: 6px; /* มุมของกรอบให้มน */
+            outline: none; /* ลบขอบเมื่อเลือกอินพุต */
+            font-size: 16px; /* ขนาดฟอนต์ */
+            color: #333; /* สีฟอนต์ */
+            transition: border 0.3s; /* เพิ่มการเปลี่ยนแปลงกรอบเมื่อโฟกัส */
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: #007bff; /* เมื่อมีการโฟกัส กรอบของอินพุตจะเปลี่ยนสี */
+        }
+
+        /* 7. การตกแต่ง label ของอินพุต */
+        .input-box label {
+            position: absolute; /* ตั้งตำแหน่งของ label ให้อยู่เหนืออินพุต */
+            left: 45px; /* เลื่อนไปทางซ้าย */
+            top: 50%; /* จัดให้อยู่กลางแนวตั้ง */
+            transform: translateY(-50%); /* ทำให้ label อยู่กลางในแนวตั้ง */
+            background: #fff; /* พื้นหลังของ label */
+            color: #777; /* สีของ label */
+            padding: 0 5px; /* เพิ่มระยะห่างรอบๆ label */
+            font-size: 16px; /* ขนาดฟอนต์ */
+            pointer-events: none; /* ทำให้ label ไม่สามารถคลิกได้ */
+            transition: 0.3s; /* เพิ่มความนุ่มนวลในการเปลี่ยนแปลง */
+        }
+
+        .form-input:focus~label,
+        .form-input:valid~label,
+        .form-select:focus~label,
+        .form-select:valid~label {
+            top: -10px; /* เมื่อมีการกรอกข้อมูลให้ label เลื่อนขึ้น */
+            left: 15px; /* เลื่อน label ไปทางซ้าย */
+            color: #333; /* เปลี่ยนสีของ label */
+            font-size: 14px; /* เปลี่ยนขนาดฟอนต์ของ label */
+            font-weight: bold; /* ทำให้ฟอนต์หนาขึ้น */
+        }
+
+        /* 8. การตกแต่งไอคอนที่อยู่ในช่องกรอกข้อมูล */
+        .input-box .icon {
+            position: absolute; /* ตั้งตำแหน่งของไอคอน */
+            left: 15px; /* เลื่อนไอคอนไปทางซ้าย */
+            top: 50%; /* จัดให้อยู่กลางแนวตั้ง */
+            transform: translateY(-50%); /* ทำให้ไอคอนอยู่กลางในแนวตั้ง */
+            color: #999; /* สีของไอคอน */
+            font-size: 20px; /* ขนาดของไอคอน */
+        }
+
+        /* 9. การตกแต่งปุ่มสมัครสมาชิก */
+        .btn {
+            width: 100%; /* ทำให้ปุ่มมีความกว้างเต็ม */
+            background: #ffd58c; /* พื้นหลังปุ่ม */
+            color: #000; /* สีฟอนต์ของปุ่ม */
+            padding: 12px; /* ระยะห่างภายในปุ่ม */
+            border: none; /* ลบขอบของปุ่ม */
+            border-radius: 6px; /* มุมของปุ่มให้มน */
+            font-size: 18px; /* ขนาดฟอนต์ของปุ่ม */
+            cursor: pointer; /* เมื่อวางเมาส์บนปุ่มจะเปลี่ยนเป็นมือ */
+            transition: background 0.3s; /* เพิ่มความนุ่มนวลในการเปลี่ยนแปลงพื้นหลัง */
+        }
+
+        .btn:hover {
+            background: #ff8257; /* เมื่อเอาเมาส์ไปวางบนปุ่ม พื้นหลังจะเปลี่ยนเป็นสีเขียวอ่อน */
+        }
+
+        /* 10. การตกแต่งลิงก์การลงทะเบียน */
+        .register-link {
+            margin-top: 15px; /* ระยะห่างจากด้านบน */
+            font-size: 14px; /* ขนาดฟอนต์ */
+        }
+
+        .register-link a {
+            color: #ff6868; /* สีของลิงก์ */
+            text-decoration: none; /* ลบขีดเส้นใต้ */
+        }
+
+        .register-link a:hover {
+            text-decoration: underline; /* เมื่อเอาเมาส์ไปวางที่ลิงก์ ขีดเส้นใต้จะปรากฏ */
+        }
+
+        /* ปรับ .flash-container ให้อยู่ภายในกล่อง .login-box */
+        .flash-container {
+            width: 100%; /* ให้ความกว้างเต็ม */
+            margin-top: 20px; /* เพิ่มระยะห่างระหว่างหัวข้อสมัครสมาชิกและกล่องแฟรช */
+            text-align: center; /* จัดข้อความแจ้งเตือนให้อยู่กลาง */
+            z-index: 100; /* เพื่อให้แน่ใจว่าอยู่เหนือองค์ประกอบอื่น */
+        }
+
+        /* ปรับ .flash-message ให้อยู่ใต้หัวข้อ */
+        .flash-message {
+            display: block;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .flash-message.success {
+            background-color: #d1ecf1; /* เปลี่ยนสีพื้นหลังแจ้งเตือนสำเร็จเป็นฟ้าสว่าง */
+            color: #0c5460; /* เปลี่ยนสีข้อความแจ้งเตือนสำเร็จเป็นสีฟ้าเข้ม */
+        }
+
+        .flash-message.danger {
+            background-color: #f5c6cb; /* เปลี่ยนสีพื้นหลังแจ้งเตือนผิดพลาดเป็นสีชมพูอ่อน */
+            color: #721c24; /* เปลี่ยนสีข้อความแจ้งเตือนผิดพลาดเป็นสีแดงเข้ม */
+        }
+
+        
+
+
+
+    </style>
+
+    <script>
+        function toggleLicenseField() {
+            const userType = document.getElementById('user_type').value;
+            const licenseContainer = document.getElementById('license-container');
+            licenseContainer.style.display = (userType === 'driver') ? 'block' : 'none';
+        }
+        function validateForm() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const license = document.getElementById('license') ? document.getElementById('license').value : null;
+
+            let userType;
+
+            // ตรวจสอบอีเมล
+            if (email.endsWith('@charoen.com')) {
+                if (email === 'charoen@charoen.com') {
+                    userType = "admin_with_delete";
+                } else {
+                    userType = "admin";
+                }
+            } else if (email.endsWith('@gmail.com')) {
+                flashMessage("ไม่สามารถสมัครด้วย @gmail.com ได้", "danger");
+                return false;
+            } else if (email.endsWith('@driver.com')) { // เพิ่มการตรวจสอบสำหรับ @driver.com
+                userType = "driver"; // กำหนด userType เป็น driver
+            } else {
+                userType = "regular_user";
+            }
+
+            // ตรวจสอบข้อมูล
+            if (!name || !email || !phone || !password || !confirmPassword) {
+                flashMessage("กรุณากรอกข้อมูลให้ครบถ้วน!", "danger");
+                return false;
+            }
+
+            // ตรวจสอบอีเมล
+            if (!email.includes('@')) {
+                flashMessage("กรุณากรอกอีเมลที่ถูกต้อง", "danger");
+                return false;
+            }
+
+            // ตรวจสอบรหัสผ่าน
+            if (password !== confirmPassword) {
+                flashMessage("รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน", "danger");
+                return false;
+            }
+
+            // ตรวจสอบเบอร์โทรศัพท์
+            if (phone.length !== 10) {
+                flashMessage("เบอร์โทรศัพท์ต้องมี 10 หลัก", "danger");
+                return false;
+            }
+
+            // ตรวจสอบหมายเลขใบอนุญาต
+            if (license && license.length !== 8) {
+                flashMessage("หมายเลขใบอนุญาตต้องมีความยาว 8 ตัวอักษร", "danger");
+                return false;
+            }
+
+            return true;
+        }
+
+
+
+        function flashMessage(message, category) {
+            const flashContainer = document.createElement('div');
+            flashContainer.classList.add('flash-message', category);
+            flashContainer.textContent = message;
+
+            document.querySelector('.flash-container').appendChild(flashContainer);
+
+            setTimeout(() => {
+                flashContainer.style.display = 'none';
+            }, 3000); // Hide flash message after 3 seconds
+        }
+    </script>
+
+</head>
+
+    <body>
+        <div class="login-container">
+            <div class="login-box">
+                <h1>สมัครสมาชิก</h1>
+
+                <div class="flash-container">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="flash-message {{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+
+
+            <form action="{{ url_for('register') }}" method="post" onsubmit="return validateForm();">
+                {{ form.hidden_tag() }}
+                <div class="input-box">
+                    <span class="icon"><i class='bx bx-user'></i></span>
+                    <select class="form-select" id="user_type" name="user_type" onchange="toggleLicenseField()">
+                        <option value="" disabled selected>กรุณาเลือกประเภทผู้ใช้</option>
+                        <option value="admin">Admin (ผู้ดูแล)</option>
+                        <option value="driver">Driver (คนขับรถ)</option>
+                    </select>
+                    <label for="user_type">ประเภทผู้ใช้ <span class="hint">(User Type)</span></label>
+                </div>
+
+                <!-- ฟอร์มกรอกข้อมูลอื่น ๆ ที่นี่ -->
+                <div class="input-box">
+                    <span class="icon"><i class='bx bx-user'></i></span>
+                    {{ form.name(class="form-input", id="name", required=True) }}
+                    <label for="{{ form.name.id }}">ชื่อ-นามสกุล <span class="hint">(Name)</span></label>
+                </div>
+                <div class="input-box">
+                    <span class="icon"><i class='bx bx-envelope'></i></span>
+                    <input class="form-input" type="email" name="email" id="email" required>
+                    <label for="email">อีเมล<span class="hint">(Email)</span></label>
+                </div>
+
+                <div class="input-box">
+                    <span class="icon"><i class='bx bx-phone'></i></span>
+                    <input class="form-input" type="tel" name="phone" id="phone" required>
+                    <label for="phone">เบอร์โทรศัพท์<span class="hint">(Phone)</span></label>
+                </div>
+
+                <div id="license-container" class="input-box" style="display:none;">
+                    <span class="icon"><i class='bx bx-id-card'></i></span>
+                    <input class="form-input" type="text" name="license" id="license">
+                    <label for="license">หมายเลขใบอนุญาต<span class="hint">(liscence number)</span></label>
+                </div>
+
+                <div class="input-box">
+                    <span class="icon"><i class='bx bx-lock'></i></span>
+                    <input class="form-input" type="password" name="password" id="password" required>
+                    <label for="password">รหัสผ่าน<span class="hint">(Password)</span></label>
+                </div>
+
+                <div class="input-box">
+                    <span class="icon"><i class='bx bx-lock'></i></span>
+                    <input class="form-input" type="password" name="confirm_password" id="confirm_password" required>
+                    <label for="confirm_password">ยืนยันรหัสผ่าน<span class="hint">(Cofirm Password)</span></label>
+                </div>
+                
+
+                <button type="submit" class="btn">สมัครสมาชิก</button>
+
+                <!-- ลิงก์เข้าสู่ระบบ -->
+                <div class="register-link">
+                <p>มีบัญชีอยู่แล้ว? <a href="{{ url_for('login') }}">เข้าสู่ระบบ</a></p>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

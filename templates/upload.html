@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route from Excel</title>
+    <!-- นำเข้า CSS ของ Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet"> <!-- เพิ่มไอคอนจาก Bootstrap Icons -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+        /* ปรับแต่ง navbar ให้เหมือนกันในทุกหน้า */
+        .navbar-custom {
+            background-color: #ee9626; /* สีพื้นหลังแถบเมนู */
+            height: 70px; /* ความสูงของ navbar */
+            border-radius: 15px; /* โค้งมนที่ขอบของ navbar */
+        }
+
+        .navbar-brand {
+            font-size: 2rem;
+            color: #ffffff;
+        }
+        /* เพิ่มการปรับปรุงเพื่อให้เมนูที่เลือกอยู่มีพื้นหลังสีที่ชัดเจน */
+        .navbar-nav .nav-link.active {
+            background-color: #d77a22; /* สีพื้นหลังของเมนูที่เลือก */
+            color: #ffffff !important; /* ให้ตัวอักษรสีขาว */
+            border-radius: 18px; /* ความโค้งมนที่ขอบ */
+        }
+
+        .navbar-nav .nav-link {
+            color: #000 !important;
+            background-color: #ee9626;
+            border-radius: 12px;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: #d77a22;
+            color: #ffffff !important;
+            border-radius: 18px;
+        }
+
+        .container {
+            margin-top: 100px;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 1rem;
+            font-weight: 50;
+        }
+
+        .btn-custom {
+            margin-top: 5px;
+            background-color: #0588c8;
+            color: #fff;
+            border: none;
+            border-radius: 5px; /* เพิ่มการโค้งมน */
+            font-size: 16.5px; /* เพิ่มขนาดตัวอักษร */
+        }
+
+        .btn-custom:hover {
+            background-color: #0588c8;
+        }
+
+
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #397d54;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .flash-message {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: .25rem;
+            color: #ffffff;
+        }
+
+        .flash-message.success {
+            background-color: #28a745;
+        }
+
+        .flash-message.danger {
+            background-color: #dc3545;
+        }
+
+        /* Loading screen styles */
+        #loading {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+        }
+
+        /* Spinner styles */
+        .spinner {
+            border: 8px solid rgba(0, 0, 0, 0.1);
+            border-top: 8px solid #000;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar with Menu -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">J.Charoen Shrimp Feed</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'upload' else '' }}" href="{{ url_for('upload') }}">
+                            <i class="bi bi-graph-up"></i> คำนวนเส้นทางการจัดส่ง
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'map_driver' else '' }}" href="{{ url_for('map_driver') }}">
+                            <i class="bi bi-map"></i> แผนที่การจัดส่ง
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'customer_list' else '' }}" href="{{ url_for('customer_list') }}">
+                            <i class="bi bi-person"></i> ข้อมูลลูกค้า
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'product_list' else '' }}" href="{{ url_for('product_list') }}">
+                            <i class="bi bi-box"></i> รายการสินค้า
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'logout' else '' }}" href="{{ url_for('logout') }}">
+                            <i class="bi bi-box-arrow-right"></i> ออกจากระบบ
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <!-- Loading Screen -->
+            <div id="loading">
+                <div class="spinner"></div>
+                กำลังคำนวณเส้นทาง โปรดรอสักครู่
+            </div>
+
+            <h1 class="mb-4 form-group label">อัพโหลดไฟล์รายการจัดส่งสินค้า</h1>
+
+            <!-- แสดงข้อความ flash -->
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                <div id="flash-messages">
+                    {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                <script>
+                    // Hide flash messages after 3 seconds
+                    setTimeout(function() {
+                        const flashMessages = document.getElementById('flash-messages');
+                        if (flashMessages) {
+                            flashMessages.style.display = 'none';
+                        }
+                    }, 3000);
+                </script>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Form for uploading excel file -->
+            <form id="uploadForm" class="form-container" action="{{ url_for('map_excel') }}" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="fileInput">เลือกไฟล์ Excel : ชื่อ นามสกุล ที่อยู่ เบอร์โทรศัพท์ พิกัด ละติจูด ลองจิจูด รายการสินค้า จำนวนการสั่งซื้อ วันที่จัดส่ง </label>
+                    <input id="fileInput" type="file" name="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="form-control">
+                </div>
+                <input id="submitButton" type="submit" value="อัปโหลด" class="btn-custom">
+            </form>
+
+        </div>
+    </div>
+
+    <!-- นำเข้า JavaScript ของ Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        const form = document.querySelector('#uploadForm');
+        const submitButton = document.querySelector('#submitButton');
+        const loading = document.querySelector('#loading');
+        const fileInput = document.querySelector('#fileInput');
+
+        // ป้องกันการส่งฟอร์มถ้าไม่มีไฟล์
+        form.addEventListener('submit', function(event) {
+            if (fileInput.files.length === 0) {
+                alert("กรุณาเลือกไฟล์ก่อนที่จะส่ง");
+                event.preventDefault();  // Prevent form from submitting
+            } else {
+                // แสดงหน้าโหลด
+                loading.style.visibility = 'visible';
+            }
+        });
+    </script>
+</body>
+
+</html>

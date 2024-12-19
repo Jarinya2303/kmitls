@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+
+        /* ปรับแต่ง navbar ให้เหมือนกันในทุกหน้า */
+        .navbar-custom {
+            background-color: #ee9626; /* สีพื้นหลังแถบเมนู */
+            height: 70px; /* ความสูงของ navbar */
+            border-radius: 15px; /* โค้งมนที่ขอบของ navbar */
+        }
+
+        .navbar-brand {
+            font-size: 2rem;
+            color: #ffffff;
+        }
+
+        .navbar-nav .nav-link.active {
+            background-color: #d77a22; /* สีพื้นหลังของเมนูที่เลือก */
+            color: #ffffff !important; /* ตัวอักษรสีขาว */
+            border-radius: 18px; /* ความโค้งมนที่ขอบ */
+        }
+
+
+        .navbar-nav .nav-link {
+            color: #000 !important;
+            background-color: #ee9626;
+            border-radius: 12px;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: #d77a22;
+            color: #ffffff !important;
+            border-radius: 18px;
+        }
+
+        .dashboard-section {
+            margin-bottom: 10px;
+            padding: 100px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #ffff; /* สีพื้นหลังของส่วนแดชบอร์ด */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1.h2 {
+            margin-top: 60px;
+            font-size: 1.5rem; /* ขนาดตัวอักษรสำหรับแดชบอร์ด */
+        }
+
+        h3 {
+            margin-bottom: 20px;
+            font-size: 1.25rem; /* ขนาดตัวอักษรสำหรับสโตร์การเก็บของ */
+        }
+
+        .form-label {
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background-color: #397d54; /* สีปุ่มใหม่ */
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #285f40; /* สีเมื่อเอาเมาส์ไปวาง */
+        }
+
+        /* รูปภาพที่แสดงในแดชบอร์ด */
+        .image-section {
+            text-align: center;
+            margin-top: 40px;
+            position: relative; /* เพื่อให้สามารถใช้ตำแหน่งที่ตั้งได้ */
+            top: 15px; /* ขยับรูปภาพขึ้น 50px */
+        }
+
+        .image-section img {
+            width: 60vw; /* ให้รูปภาพมีความกว้างเต็มหน้าจอ */
+            height: 60vh; /* ให้รูปภาพสูงเต็มหน้าจอ */
+            object-fit: cover; /* ให้รูปภาพครอบคลุมพื้นที่ทั้งหมดโดยไม่ทำให้ภาพยืดหรือบิดเบือน */
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('home') }}">J.Charoen Shrimp Feed</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto d-flex"> <!-- d-flex + ms-auto ทำให้เมนูขยับไปขวา -->
+                    
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == url_for('upload') else '' }}" href="{{ url_for('upload') }}">
+                            <i class="bi bi-graph-up"></i> คำนวนเส้นทางการจัดส่ง
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'map_excel' else '' }}" href="{{ url_for('map_excel') }}">
+                            <i class="bi bi-map"></i> แผนที่การจัดส่ง
+                        </a>
+
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == url_for('customer_list') else '' }}" href="{{ url_for('customer_list') }}">
+                            <i class="bi bi-person"></i> ข้อมูลลูกค้า
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == url_for('product_list') else '' }}" href="{{ url_for('product_list') }}">
+                            <i class="bi bi-box"></i> รายการสินค้า
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == url_for('logout') else '' }}" href="{{ url_for('logout') }}">
+                            <i class="bi bi-box-arrow-right"></i> ออกจากระบบ
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard-section">
+            <div class="image-section">
+                <img src="{{ url_for('static', filename='จ.jpg') }}" alt="ภาพตัวอย่าง">
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>

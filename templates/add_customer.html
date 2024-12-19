@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เพิ่มรายชื่อลูกค้า</title>
+    <!-- นำเข้า CSS ของ Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: .5rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: .375rem .75rem;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+        }
+
+        .btn-custom {
+            margin-top: 20px;
+            background-color: #ffd966;
+            color: #000;
+            border: none;
+        }
+
+        .btn-custom:hover {
+            background-color: #ff8257;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #b02a29;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .flash-message {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: .25rem;
+            color: #ffffff;
+        }
+
+        .flash-message.success {
+            background-color: #28a745;
+        }
+
+        .flash-message.danger {
+            background-color: #dc3545;
+        }
+
+        /* CSS สำหรับการไฮไลต์ชื่อภาค */
+        select option {
+            font-weight: normal;
+        }
+
+        select option[value^="region_"] {
+            font-weight: bold;
+            background-color: #e0e0e0;
+            color: #333;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1 class="mb-4">เพิ่มลูกค้า</h1>
+
+            <!-- แสดงข้อความ flash -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div>
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                      {{ message }}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
+
+
+            <form method="POST" id="customerForm">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.first_name.label }}
+                    {{ form.first_name(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.last_name.label }}
+                    {{ form.last_name(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.address.label }}
+                    <input type="text" name="address" class="form-control" id="addressInput" placeholder="กรอกที่อยู่">
+                </div>
+                <div class="form-group">
+                    {{ form.phone.label }}
+                    {{ form.phone(class="form-control") }}
+                </div>
+                <!-- ฟิลด์ละติจูด -->
+                <div class="form-group">
+                    <label for="latitude">ละติจูด</label>
+                    <input type="text" name="latitude" class="form-control" id="latitude" placeholder="">
+                </div>
+                <!-- ฟิลด์ลองติจูด -->
+                <div class="form-group">
+                    <label for="longitude">ลองติจูด</label>
+                    <input type="text" name="longitude" class="form-control" id="longitude" placeholder="">
+                </div>
+                <!-- ฟิลด์พิกัดรวม -->
+                <div class="form-group">
+                    <label for="coordinate">พิกัด </label>
+                    <input type="text" name="coordinate" class="form-control" id="coordinate" placeholder="">
+                </div>
+                <button type="submit" class="btn btn-custom">{{ form.submit.label }}</button>
+            </form>
+            <a href="{{ url_for('customer_list') }}" class="back-link">กลับไปหน้าแรก</a>
+        </div>
+    </div>
+
+    <!-- นำเข้า JavaScript ของ Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>
